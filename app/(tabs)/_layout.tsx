@@ -1,10 +1,21 @@
 import { TabBarIcon } from "@/components/TabBarIcon";
+import { useAppDispatch } from "@/hooks/hooks";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { clear } from "@/redux/reducers/playerSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function TabLayout() {
   const theme = useThemeColor();
+  const dispatch = useAppDispatch();
+
+  //TODO: REMOVER PARA SALVAR DADOS!!!
+  useEffect(() => {
+    console.log("Resetou tudo!!!");
+    AsyncStorage.clear();
+    dispatch(clear());
+  }, []);
 
   return (
     <Tabs
