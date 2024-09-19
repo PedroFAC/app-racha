@@ -1,11 +1,11 @@
 import { combineReducers, configureStore, Tuple } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from 'redux-persist'
-import playerSlice from './reducers/playerSlice'
+import playersSlice from './reducers/playerSlice'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const rootReducer = combineReducers({ 
-    player:playerSlice,
+    players:playersSlice,
   })
 
 const persistConfig = {
