@@ -5,8 +5,8 @@ export type Player = {
   rating:number;
 }
 
-export const playerSlice = createSlice({
-  name: 'player',
+export const playersSlice = createSlice({
+  name: 'players',
   initialState: {
     players: [] as Player[]
   },
@@ -21,6 +21,6 @@ export const playerSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { addPlayer, clear } = playerSlice.actions
+export const { addPlayer, clear } = playersSlice.actions
 
-export default playerSlice.reducer
+export default playersSlice.reducer
