@@ -7,46 +7,16 @@ import { Audio } from "expo-av";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { useTimer } from "@/hooks/useTimer";
+import ActiveTimer from "@/components/ActiveTimer";
 
 export default function Timer() {
   const theme = useThemeColor();
-
-  const [time, setTime] = useState(0);
-  const [play, setPlay] = useState(false);
+  const { time, pause, play, stopTimer, pauseOrUnpauseTimer, startTimer } =
+    useTimer();
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
-  const [pause, setPause] = useState(true);
   const calculatedTime = minutes * 60000 + seconds * 1000;
-
-  async function playSound() {
-    console.log("Loading Sound");
-    //TODO: ../../../../ = Cringe
-    const { sound } = await Audio.Sound.createAsync(
-      require("../../assets/sound.mp3")
-    );
-    console.log("Playing Sound");
-    await sound.playAsync();
-  }
-
-  useEffect(() => {
-    setTime(calculatedTime);
-  }, [minutes, seconds]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (time > 0 && play && !pause) {
-        setTime(time - 1000);
-      }
-    }, 1000);
-
-    if (time === 0 && play) {
-      alert("Tempo Acabou");
-      playSound();
-      setPlay(false);
-    }
-    return () => clearInterval(interval);
-  }, [time, play, pause]);
-
   const timerCallbacks = {
     handleMoreMinutes: () => setMinutes(minutes + 1),
     handleMinusMinutes: () => {
@@ -74,9 +44,7 @@ export default function Timer() {
             style={styles(theme).button}
             onPress={() => {
               if (calculatedTime > 0) {
-                setTime(calculatedTime);
-                setPlay(true);
-                setPause(false);
+                startTimer(calculatedTime);
               }
             }}
           >
@@ -84,35 +52,13 @@ export default function Timer() {
           </TouchableOpacity>
         </>
       ) : (
-        <>
-          <Text style={styles(theme).text}>{format(time, "mm:ss")}</Text>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              marginTop: 40,
-              gap: 20,
-              alignItems: "center",
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => setPlay(false)}
-              style={styles(theme).button}
-            >
-              <FontAwesome5 name="stop" size={24} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setPause(!pause)}
-              style={styles(theme).button}
-            >
-              <FontAwesome5
-                name={pause ? "play" : "pause"}
-                size={24}
-                color="white"
-              />
-            </TouchableOpacity>
-          </View>
-        </>
+        <ActiveTimer
+          time={time}
+          pause={pause}
+          stopTimer={stopTimer}
+          play={play}
+          pauseOrUnpauseTimer={pauseOrUnpauseTimer}
+        />
       )}
     </View>
   );
