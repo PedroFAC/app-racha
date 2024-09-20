@@ -2,6 +2,7 @@ import { ColorType } from "@/constants/Colors";
 import { CommonStyles } from "@/constants/CommonStyles";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 interface ITimerNumberProps {
   play: boolean;
@@ -35,8 +36,8 @@ export default function TimerNumber({
             style={styles(theme).button}
             onPress={handleMinusMinutes}
           >
-            <Text style={styles(theme).buttonText}>-</Text>
-          </TouchableOpacity>
+            <FontAwesome5 name="minus" size={24} color="white" />
+            </TouchableOpacity>
         )}
         <Text style={styles(theme).text}>
           {minutes < 10 ? `0${minutes}` : minutes}
@@ -46,7 +47,7 @@ export default function TimerNumber({
             style={styles(theme).button}
             onPress={handleMoreMinutes}
           >
-            <Text style={styles(theme).buttonText}>+</Text>
+            <FontAwesome5 name="plus" size={24} color="white" />
           </TouchableOpacity>
         )}
       </View>
@@ -57,8 +58,8 @@ export default function TimerNumber({
             style={styles(theme).button}
             onPress={handleMinusSeconds}
           >
-            <Text style={styles(theme).buttonText}>-</Text>
-          </TouchableOpacity>
+            <FontAwesome5 name="minus" size={24} color="white" />
+            </TouchableOpacity>
         )}
         <Text style={styles(theme).text}>
           {seconds <= 0 ? `0${seconds}` : seconds}
@@ -68,8 +69,8 @@ export default function TimerNumber({
             style={styles(theme).button}
             onPress={handleMoreSeconds}
           >
-            <Text style={styles(theme).buttonText}>+</Text>
-          </TouchableOpacity>
+            <FontAwesome5 name="plus" size={24} color="white" />
+            </TouchableOpacity>
         )}
       </View>
     </View>
