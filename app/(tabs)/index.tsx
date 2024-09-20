@@ -9,6 +9,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useTimer } from "@/hooks/useTimer";
 import ActiveTimer from "@/components/ActiveTimer";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 
 export default function Timer() {
   const theme = useThemeColor();
@@ -29,6 +30,10 @@ export default function Timer() {
       seconds <= 0 ? setSeconds(50) : setSeconds(seconds - 10);
     },
   };
+
+  useEffect(() => {
+    play ? activateKeepAwakeAsync() : deactivateKeepAwake();
+  }, [play]);
 
   return (
     <View style={styles(theme).container}>
