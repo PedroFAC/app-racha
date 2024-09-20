@@ -1,21 +1,10 @@
 import { TabBarIcon } from "@/components/TabBarIcon";
-import { useAppDispatch } from "@/hooks/hooks";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { clear } from "@/redux/reducers/playerSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Tabs } from "expo-router";
-import React, { useEffect } from "react";
+import React from "react";
 
 export default function TabLayout() {
   const theme = useThemeColor();
-  const dispatch = useAppDispatch();
-
-  //TODO: REMOVER PARA SALVAR DADOS!!!
-  useEffect(() => {
-    console.log("Resetou tudo!!!");
-    AsyncStorage.clear();
-    dispatch(clear());
-  }, []);
 
   return (
     <Tabs
@@ -30,6 +19,18 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "timer" : "timer-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="teams"
+        options={{
+          title: "Times",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "people" : "people-outline"}
               color={color}
             />
           ),
