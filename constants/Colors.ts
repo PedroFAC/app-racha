@@ -1,14 +1,16 @@
 export type ColorType = {
-  text: string,
-  background: string,
-  tabBackground: string,
-  border:string,
-  inputBackground:string,
+  text: string;
+  background: string;
+  tabBackground: string;
+  border:string;
+  inputBackground:string;
+  starColor: string;
+  buttonColor:string;
 }
 
 export type ColorsType = {
-  light: ColorType,
-  dark: ColorType
+  light: ColorType;
+  dark: ColorType;
 }
 
 export const Colors : ColorsType = {
@@ -18,6 +20,8 @@ export const Colors : ColorsType = {
     tabBackground : '#687076',
     border: '#11181C',
     inputBackground: '#D0D0D0',
+    starColor: '#3ad111',
+    buttonColor: '#007AFF',
   },
   dark: {
     text: '#ECEDEE',
@@ -25,5 +29,7 @@ export const Colors : ColorsType = {
     tabBackground : '#9BA1A6',
     border: '#ECEDEE',
     inputBackground: '#151718',
+    starColor: '#1e6b09',
+    buttonColor: '#007AFF',
   },
 };

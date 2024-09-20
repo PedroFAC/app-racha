@@ -2,27 +2,49 @@ import { View, StyleSheet, Text, Button } from "react-native";
 import { ColorType } from "@/constants/Colors";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import ThemedTextInput from "@/components/TextInput";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import StarsRating from "@/components/StarsRating";
-import { addPlayer, Player } from "@/redux/reducers/playerSlice";
+import { addPlayer, editPlayer, Player } from "@/redux/reducers/playerSlice";
 import { useAppDispatch } from "@/hooks/hooks";
 import starArrayToNumber from "@/utils/starArrayToNumber";
+import { Routes, useLocalSearchParams, useRouter } from "expo-router";
+import ratingNumberToArray from "@/utils/ratingNumberToArray";
 
 export default function AddPlayer() {
   const theme = useThemeColor();
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const player: Player = params as Player;
 
-  const [name, setName] = useState<string>("");
-  const [stars, setStars] = useState([true, false, false, false, false]);
+  const [name, setName] = useState<string>(player.playerName ?? "");
+  const [stars, setStars] = useState(
+    ratingNumberToArray(player.rating ?? 1) ?? [
+      true,
+      false,
+      false,
+      false,
+      false,
+    ]
+  );
 
-  const disable = useMemo(() => {
-    return name.trim().length === 0;
-  }, [name]);
+  const isEdit = useMemo(() => player.playerName != null, [player]);
 
-  const resetInputs = useCallback(() => {
-    setName("");
-    setStars([true, false, false, false, false]);
-  }, []);
+  const disable = useMemo(() => name.trim().length === 0, [name]);
+
+  const handlePress = () => {
+    const newPlayer: Player = {
+      playerName: name.trim(),
+      rating: starArrayToNumber(stars),
+    };
+    if (isEdit) {
+      dispatch(editPlayer({ player: newPlayer, oldName: player.playerName }));
+      router.back();
+      return;
+    }
+    dispatch(addPlayer(newPlayer));
+    router.back();
+  };
 
   const handleStarChange = (rating: number) => {
     if (stars[rating]) {
@@ -48,18 +70,11 @@ export default function AddPlayer() {
         <Text style={styles(theme).text}>Nome</Text>
         <ThemedTextInput onChangeText={(text) => setName(text)} value={name} />
       </View>
-      <StarsRating onChange={handleStarChange} stars={stars} />
+      <StarsRating onChange={handleStarChange} stars={stars} starSize={30} />
       <Button
-        title="Adicionar"
+        title={isEdit ? "Editar" : "Adicionar"}
         disabled={disable}
-        onPress={() => {
-          const player: Player = {
-            playerName: name.trim(),
-            rating: starArrayToNumber(stars),
-          };
-          dispatch(addPlayer(player));
-          resetInputs();
-        }}
+        onPress={handlePress}
       />
     </View>
   );

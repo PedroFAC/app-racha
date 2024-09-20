@@ -1,26 +1,53 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type Player = {
-  playerName:string;
-  rating:number;
-}
+  playerName: string;
+  rating: number;
+};
 
 export const playersSlice = createSlice({
-  name: 'players',
+  name: "players",
   initialState: {
-    players: [] as Player[]
+    players: [] as Player[],
   },
   reducers: {
-    addPlayer: (state,  action: PayloadAction<Player>) => {
+    addPlayer: (state, action: PayloadAction<Player>) => {
+      if (state.players.find((p) => p.playerName === action.payload.playerName))
+        return;
       state.players.push(action.payload);
+    },
+    editPlayer: (
+      state,
+      action: PayloadAction<{ player: Player; oldName: string }>
+    ) => {
+      const players = state.players.filter(
+        (p) => p.playerName === action.payload.player.playerName
+      );
+      if (
+        action.payload.oldName !== action.payload.player.playerName &&
+        players.length > 0
+      )
+        return;
+      if (players.length > 1) return;
+      const oldPlayerIndex = state.players.findIndex(
+        (p) => p.playerName === action.payload.oldName
+      );
+      if (oldPlayerIndex < 0) return;
+      state.players[oldPlayerIndex] = action.payload.player;
+    },
+    deletePlayer: (state, action: PayloadAction<{ name: string }>) => {
+      state.players = state.players.filter(
+        (p) => p.playerName !== action.payload.name
+      );
     },
     clear: (state) => {
       state.players = [];
     },
-  }
-})
+  },
+});
 
 // Action creators are generated for each case reducer function
-export const { addPlayer, clear } = playersSlice.actions
+export const { addPlayer, editPlayer, deletePlayer, clear } =
+  playersSlice.actions;
 
-export default playersSlice.reducer
+export default playersSlice.reducer;
