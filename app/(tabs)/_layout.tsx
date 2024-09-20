@@ -36,12 +36,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="add"
+        name="list"
         options={{
-          title: "Adicionar",
+          title: "Jogadores",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={focused ? "person-add" : "person-add-outline"}
+              name={focused ? "football" : "football-outline"}
               color={color}
             />
           ),

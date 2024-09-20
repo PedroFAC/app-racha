@@ -21,7 +21,16 @@ export default function RootLayout() {
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
           <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(tabs)"
+              options={{ headerShown: false, title: "Home" }}
+            />
+            <Stack.Screen
+              name="add"
+              options={{
+                title: "Adicionar Jogador",
+              }}
+            />
           </Stack>
         </ThemeProvider>
       </PersistGate>
