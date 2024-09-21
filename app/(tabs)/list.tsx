@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   Alert,
+  Platform,
 } from "react-native";
 import { ColorType } from "@/constants/Colors";
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -16,6 +17,7 @@ import ratingNumberToArray from "@/utils/ratingNumberToArray";
 import { deletePlayer, Player } from "@/redux/reducers/playerSlice";
 import { Link, router } from "expo-router";
 import { useState } from "react";
+import webAlert from "@/utils/webAlert";
 
 export default function ListPlayers() {
   const theme = useThemeColor();
@@ -28,23 +30,42 @@ export default function ListPlayers() {
     return <View style={styles(theme).separator} />;
   };
 
+  const handleDelete = (player: Player) => {
+    if (Platform.OS === "web") {
+      webAlert("Deseja realmente remover esse jogador?", "", [
+        {
+          text: "Sim",
+          onPress: () => {
+            dispatch(deletePlayer({ name: player.playerName }));
+          },
+        },
+        {
+          text: "Não",
+          style: "cancel",
+        },
+      ]);
+      return;
+    }
+    Alert.alert("Deseja realmente remover esse jogador?", "", [
+      {
+        text: "Não",
+        style: "cancel",
+      },
+      {
+        text: "Sim",
+        onPress: () => {
+          dispatch(deletePlayer({ name: player.playerName }));
+        },
+      },
+    ]);
+  };
+
   const renderItem = (player: Player) => {
     return (
       <TouchableOpacity
         style={styles(theme).listItemContainer}
         onLongPress={() => {
-          Alert.alert("Deseja realmente remover esse jogador?", "", [
-            {
-              text: "Não",
-              style: "cancel",
-            },
-            {
-              text: "Sim",
-              onPress: () => {
-                dispatch(deletePlayer({ name: player.playerName }));
-              },
-            },
-          ]);
+          handleDelete(player);
         }}
         onPress={() => {
           router.push<Player>({ pathname: "/add", params: player });
