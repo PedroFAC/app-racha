@@ -14,10 +14,11 @@ import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import isEmptyArray from "@/utils/isEmptyArray";
 import StarsRating from "@/components/StarsRating";
 import ratingNumberToArray from "@/utils/ratingNumberToArray";
-import { deletePlayer, Player } from "@/redux/reducers/playerSlice";
+import { checkPlayer, deletePlayer, Player } from "@/redux/reducers/playerSlice";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import webAlert from "@/utils/webAlert";
+import Checkbox from "expo-checkbox";
 
 export default function ListPlayers() {
   const theme = useThemeColor();
@@ -68,18 +69,30 @@ export default function ListPlayers() {
           handleDelete(player);
         }}
         onPress={() => {
-          router.push<Player>({ pathname: "/add", params: player });
+          router.push<Player>({ pathname: "/add", params: { playerName: player.playerName, rating: `${player.rating}` } });
         }}
       >
         <Text style={styles(theme).listItemText} numberOfLines={1}>
           {player.playerName}
         </Text>
-        <StarsRating
-          onChange={() => {}}
-          disabled={true}
-          stars={ratingNumberToArray(player.rating)}
-          starSize={22}
-        />
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 10,
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <StarsRating
+            onChange={() => {}}
+            disabled={true}
+            stars={ratingNumberToArray(player.rating)}
+            starSize={22}
+          />
+          <Checkbox onValueChange={() => {
+            dispatch(checkPlayer({ player }))
+          }} value={player.checked} />
+        </View>
       </TouchableOpacity>
     );
   };

@@ -15,7 +15,7 @@ export default function AddPlayer() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const params = useLocalSearchParams();
-  const player: Player = params as Player;
+  const player: Player = params as unknown as Player;
 
   const [name, setName] = useState<string>(player.playerName ?? "");
   const [stars, setStars] = useState(
@@ -36,6 +36,7 @@ export default function AddPlayer() {
     const newPlayer: Player = {
       playerName: name.trim(),
       rating: starArrayToNumber(stars),
+      checked: true
     };
     if (isEdit) {
       dispatch(editPlayer({ player: newPlayer, oldName: player.playerName }));
