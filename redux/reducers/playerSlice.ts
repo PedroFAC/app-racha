@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export type Player = {
   playerName: string;
   rating: number;
+  checked?: boolean;
 };
 
 export const playersSlice = createSlice({
@@ -12,38 +13,47 @@ export const playersSlice = createSlice({
       {
         playerName: "Eduardo",
         rating: 5,
+        checked: true
       },
       {
         playerName: "Leopoldo",
         rating: 3,
+        checked: true
       },
       {
         playerName: "Gouveia",
         rating: 4,
+        checked: true
       },
       {
         playerName: "Jotinha",
         rating: 3,
+        checked: true
       },
       {
         playerName: "Guilherme",
         rating: 5,
+        checked: true
       },
       {
         playerName: "Emre",
         rating: 4,
+        checked: true
       },
       {
         playerName: "Anthony",
         rating: 3,
+        checked: true
       },
       {
         playerName: "Jão",
         rating: 2,
+        checked: true
       },
       {
         playerName: "Jp",
         rating: 2,
+        checked: true
       },
     ] as Player[],
   },
@@ -51,7 +61,7 @@ export const playersSlice = createSlice({
     addPlayer: (state, action: PayloadAction<Player>) => {
       if (state.players.find((p) => p.playerName === action.payload.playerName))
         return;
-      state.players.push(action.payload);
+      state.players.push({...action.payload, checked: true});
     },
     editPlayer: (
       state,
@@ -70,12 +80,23 @@ export const playersSlice = createSlice({
         (p) => p.playerName === action.payload.oldName
       );
       if (oldPlayerIndex < 0) return;
-      state.players[oldPlayerIndex] = action.payload.player;
+      state.players[oldPlayerIndex] = {...action.payload.player, checked: state.players[oldPlayerIndex].checked};
     },
     deletePlayer: (state, action: PayloadAction<{ name: string }>) => {
       state.players = state.players.filter(
         (p) => p.playerName !== action.payload.name
       );
+    },
+    checkPlayer: (
+      state,
+      action: PayloadAction<{ player: Player}>
+    ) => {
+      const player = state.players.filter(
+        (p) => p.playerName === action.payload.player.playerName
+      )[0];
+      if(player){
+        player.checked = !player.checked
+      }
     },
     clear: (state) => {
       state.players = [];
@@ -84,7 +105,7 @@ export const playersSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { addPlayer, editPlayer, deletePlayer, clear } =
+export const { addPlayer, editPlayer, deletePlayer, clear, checkPlayer } =
   playersSlice.actions;
 
 export default playersSlice.reducer;
