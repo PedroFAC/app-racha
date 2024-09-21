@@ -1,12 +1,14 @@
-import { View, StyleSheet, Text, ScrollView, FlatList } from "react-native";
+import { View, StyleSheet, Text, FlatList, Button } from "react-native";
 import { ColorType } from "@/constants/Colors";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useAppSelector } from "@/hooks/hooks";
 import StarsRating from "@/components/StarsRating";
 import ratingNumberToArray from "@/utils/ratingNumberToArray";
 import { Player } from "@/redux/reducers/playerSlice";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import isEmptyArray from "@/utils/isEmptyArray";
+import ThemedTextInput from "@/components/TextInput";
+import stringToNumber from "@/utils/stringToNumber";
 
 export type Team = {
   name: string;
@@ -18,39 +20,76 @@ export default function ListPlayers() {
   const players = useAppSelector((state) => state.players.players);
 
   const [teams, setTeams] = useState<Team[]>([]);
+  const [playersPerTeam, setPlayersPerTeam] = useState<string>("");
 
-  useEffect(() => {
-    let playersCopy = [...players];
-    const newTeams = [];
-    let teamPlayers = [];
-    let teamCount = players.length / 3;
+  const handleSortTeams = () => {
+    const playersPerTeamNumber = stringToNumber(playersPerTeam);
+    let playersCopy = [...players.filter((p) => p.checked)];
+    const teamCount = playersCopy.length / playersPerTeamNumber;
+    const newTeams: Team[] = [];
+    let reserveCount = 1;
+    if (teamCount <= 0) return;
+    if (playersPerTeamNumber < 1) return;
 
-    if (teamCount < 1) return;
-
-    for (let teamNumber = 0; teamNumber < 3; teamNumber++) {
-      for (let index = 0; index < teamCount; index++) {
-        if (playersCopy.length <= 0) continue;
-        const randElem =
-          playersCopy[Math.floor(Math.random() * playersCopy.length)];
-        playersCopy = playersCopy.filter(
-          (p) => p.playerName !== randElem.playerName
-        );
-        teamPlayers.push(randElem);
+    playersCopy.sort((a, b) => {
+      if (a.rating > b.rating) {
+        return 1;
       }
-      newTeams.push({ name: `Time ${teamNumber + 1}`, players: teamPlayers });
-      teamPlayers = [];
+      if (a.rating < b.rating) {
+        return -1;
+      }
+      const rnd = Math.round(Math.random());
+      return rnd === 0 ? -1 : 1;
+    });
+
+    for (let teamCountIndex = 0; teamCountIndex < teamCount; teamCountIndex++) {
+      const firstPick = playersCopy.pop();
+      if (!firstPick) continue;
+      newTeams.push({
+        name: `Time ${teamCountIndex + 1}`,
+        players: [firstPick],
+      });
     }
+
+    let isPickingPlayer = true;
+    while (isPickingPlayer) {
+      if (
+        playersCopy.length === 0 &&
+        newTeams[0].players.length === playersPerTeamNumber
+      )
+        break;
+      for (
+        let teamCountIndex = 0;
+        teamCountIndex < teamCount;
+        teamCountIndex++
+      ) {
+        let playerPick = playersCopy.pop();
+        if (!playerPick) {
+          isPickingPlayer = false;
+          playerPick = { playerName: `Reserva ${reserveCount}`, rating: 0 };
+          reserveCount++;
+        }
+        newTeams[teamCountIndex] = {
+          name: `Time ${teamCountIndex + 1}`,
+          players: [...newTeams[teamCountIndex].players, playerPick],
+        };
+      }
+    }
+    newTeams.sort((a, b) => {
+      const rnd = Math.round(Math.random());
+      return rnd === 0 ? -1 : 1;
+    });
     setTeams(newTeams);
-  }, [players]);
+  };
 
   const renderSeparator = () => {
     return <View style={styles(theme).separator} />;
   };
 
-  const renderTeam = (team: Team) => {
+  const renderTeam = (team: Team, index: number) => {
     return (
       <View key={team.name}>
-        <Text style={styles(theme).text}>{team.name}</Text>
+        <Text style={styles(theme).text}>Time {index + 1}</Text>
         {!isEmptyArray(team.players) && team.players.map(renderItem)}
       </View>
     );
@@ -74,10 +113,21 @@ export default function ListPlayers() {
 
   return (
     <View style={styles(theme).container}>
+      <View style={styles(theme).inputContainer}>
+        <Text style={styles(theme).text}>Jogadores por time</Text>
+        <ThemedTextInput
+          onChangeText={(text) => setPlayersPerTeam(text)}
+          value={playersPerTeam}
+          keyboardType="number-pad"
+        />
+      </View>
+      <View style={styles(theme).inputContainer}>
+        <Button title="Sortear" onPress={handleSortTeams} />
+      </View>
       {teams && (
         <FlatList
           data={teams}
-          renderItem={({ item }) => renderTeam(item)}
+          renderItem={({ item, index }) => renderTeam(item, index)}
           keyExtractor={(item) => item.name}
           ItemSeparatorComponent={renderSeparator}
         />
@@ -112,4 +162,5 @@ const styles = (theme: ColorType) =>
       backgroundColor: theme.border,
       marginVertical: 10,
     },
+    inputContainer: { gap: 8, paddingBottom: 20 },
   });
