@@ -8,7 +8,44 @@ export type Player = {
 export const playersSlice = createSlice({
   name: "players",
   initialState: {
-    players: [] as Player[],
+    players: [
+      {
+        playerName: "Eduardo",
+        rating: 5,
+      },
+      {
+        playerName: "Leopoldo",
+        rating: 3,
+      },
+      {
+        playerName: "Gouveia",
+        rating: 4,
+      },
+      {
+        playerName: "Jotinha",
+        rating: 3,
+      },
+      {
+        playerName: "Guilherme",
+        rating: 5,
+      },
+      {
+        playerName: "Emre",
+        rating: 4,
+      },
+      {
+        playerName: "Anthony",
+        rating: 3,
+      },
+      {
+        playerName: "Jão",
+        rating: 2,
+      },
+      {
+        playerName: "Jp",
+        rating: 2,
+      },
+    ] as Player[],
   },
   reducers: {
     addPlayer: (state, action: PayloadAction<Player>) => {
