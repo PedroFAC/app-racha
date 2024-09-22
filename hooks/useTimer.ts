@@ -7,11 +7,10 @@ export function useTimer() {
   const [pause, setPause] = useState(true);
 
   async function playSound(type: "start" | "end" = "start") {
-    //TODO: ../../../../ = Cringe
     const { sound } = await Audio.Sound.createAsync(
       type === "start"
-        ? require(`../assets/start.mp3`)
-        : require(`../assets/end.mp3`)
+        ? require(`@/assets/start.mp3`)
+        : require(`@/assets/end.mp3`)
     );
     await sound.playAsync();
   }
