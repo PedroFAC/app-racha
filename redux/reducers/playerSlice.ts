@@ -13,47 +13,57 @@ export const playersSlice = createSlice({
       {
         playerName: "Eduardo",
         rating: 5,
-        checked: true
+        checked: true,
       },
       {
         playerName: "Leopoldo",
         rating: 3,
-        checked: true
+        checked: true,
       },
       {
         playerName: "Gouveia",
         rating: 4,
-        checked: true
+        checked: true,
       },
       {
         playerName: "Jotinha",
         rating: 3,
-        checked: true
+        checked: true,
       },
       {
         playerName: "Guilherme",
         rating: 5,
-        checked: true
+        checked: true,
       },
       {
         playerName: "Emre",
         rating: 4,
-        checked: true
+        checked: true,
       },
       {
         playerName: "Anthony",
         rating: 3,
-        checked: true
+        checked: true,
       },
       {
         playerName: "Jão",
         rating: 2,
-        checked: true
+        checked: true,
       },
       {
         playerName: "Jp",
         rating: 2,
-        checked: true
+        checked: true,
+      },
+      {
+        playerName: "Tiago",
+        rating: 2,
+        checked: true,
+      },
+      {
+        playerName: "Dets",
+        rating: 3,
+        checked: true,
       },
     ] as Player[],
   },
@@ -61,7 +71,7 @@ export const playersSlice = createSlice({
     addPlayer: (state, action: PayloadAction<Player>) => {
       if (state.players.find((p) => p.playerName === action.payload.playerName))
         return;
-      state.players.push({...action.payload, checked: true});
+      state.players.push({ ...action.payload, checked: true });
     },
     editPlayer: (
       state,
@@ -80,22 +90,22 @@ export const playersSlice = createSlice({
         (p) => p.playerName === action.payload.oldName
       );
       if (oldPlayerIndex < 0) return;
-      state.players[oldPlayerIndex] = {...action.payload.player, checked: state.players[oldPlayerIndex].checked};
+      state.players[oldPlayerIndex] = {
+        ...action.payload.player,
+        checked: state.players[oldPlayerIndex].checked,
+      };
     },
     deletePlayer: (state, action: PayloadAction<{ name: string }>) => {
       state.players = state.players.filter(
         (p) => p.playerName !== action.payload.name
       );
     },
-    checkPlayer: (
-      state,
-      action: PayloadAction<{ player: Player}>
-    ) => {
+    checkPlayer: (state, action: PayloadAction<{ player: Player }>) => {
       const player = state.players.filter(
         (p) => p.playerName === action.payload.player.playerName
       )[0];
-      if(player){
-        player.checked = !player.checked
+      if (player) {
+        player.checked = !player.checked;
       }
     },
     clear: (state) => {

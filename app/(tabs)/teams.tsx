@@ -9,6 +9,10 @@ import { useState } from "react";
 import isEmptyArray from "@/utils/isEmptyArray";
 import ThemedTextInput from "@/components/TextInput";
 import stringToNumber from "@/utils/stringToNumber";
+import randomizeArray from "@/utils/randomizeArray";
+import ratingMean from "@/utils/ratingMean";
+import nearestToAvg from "@/utils/nearestToAvg";
+import fillTeamWithReserves from "@/utils/fillTeamWithReserves";
 
 export type Team = {
   name: string;
@@ -25,9 +29,9 @@ export default function ListPlayers() {
   const handleSortTeams = () => {
     const playersPerTeamNumber = stringToNumber(playersPerTeam);
     let playersCopy = [...players.filter((p) => p.checked)];
-    const teamCount = playersCopy.length / playersPerTeamNumber;
+    const teamCount = Math.floor(playersCopy.length / playersPerTeamNumber);
+    const maxTeamCount = Math.ceil(playersCopy.length / playersPerTeamNumber);
     const newTeams: Team[] = [];
-    let reserveCount = 1;
     if (teamCount <= 0) return;
     if (playersPerTeamNumber < 1) return;
 
@@ -42,43 +46,71 @@ export default function ListPlayers() {
       return rnd === 0 ? -1 : 1;
     });
 
-    for (let teamCountIndex = 0; teamCountIndex < teamCount; teamCountIndex++) {
-      const firstPick = playersCopy.pop();
+    //Grab best players and randomize it
+    const bestPlayers = playersCopy.slice(-maxTeamCount);
+    randomizeArray(bestPlayers);
+
+    const totalMean: number = ratingMean(playersCopy);
+
+    // Pick the beast players to be "captain" of their teams
+    for (
+      let teamCountIndex = 0;
+      teamCountIndex < maxTeamCount;
+      teamCountIndex++
+    ) {
+      const firstPick = bestPlayers.pop();
       if (!firstPick) continue;
+      playersCopy = playersCopy.filter(
+        (p) => p.playerName !== firstPick.playerName
+      );
       newTeams.push({
         name: `Time ${teamCountIndex + 1}`,
         players: [firstPick],
       });
     }
 
+    // Start picking players
     let isPickingPlayer = true;
     while (isPickingPlayer) {
-      if (
-        playersCopy.length === 0 &&
-        newTeams[0].players.length === playersPerTeamNumber
-      )
-        break;
       for (
         let teamCountIndex = 0;
         teamCountIndex < teamCount;
         teamCountIndex++
       ) {
-        let playerPick = playersCopy.pop();
-        if (!playerPick) {
+        const currentTeam = newTeams[teamCountIndex];
+        randomizeArray(playersCopy);
+        // Grab player with the lower totalAvg - currentTeamAvg
+        let playerPick = nearestToAvg(
+          currentTeam.players,
+          playersCopy,
+          totalMean
+        );
+
+        // Break if no players left or team is full
+        if (!playerPick || currentTeam.players.length >= playersPerTeamNumber) {
           isPickingPlayer = false;
-          playerPick = { playerName: `Reserva ${reserveCount}`, rating: 0 };
-          reserveCount++;
+          break;
         }
-        newTeams[teamCountIndex] = {
-          name: `Time ${teamCountIndex + 1}`,
-          players: [...newTeams[teamCountIndex].players, playerPick],
-        };
+
+        playersCopy = playersCopy.filter(
+          (p) => p.playerName !== playerPick.playerName
+        );
+
+        currentTeam.players = [...currentTeam.players, playerPick];
       }
     }
-    newTeams.sort((a, b) => {
-      const rnd = Math.round(Math.random());
-      return rnd === 0 ? -1 : 1;
-    });
+
+    const lastTeam = newTeams[newTeams.length - 1];
+    // Check if the are players left to play
+    if (lastTeam.players.length < playersPerTeamNumber) {
+      // Add new team with players left and reserves
+      const playersInTeam = newTeams[newTeams.length - 1].players;
+      lastTeam.players = fillTeamWithReserves(
+        [...playersInTeam, ...playersCopy],
+        totalMean,
+        playersPerTeamNumber
+      );
+    }
     setTeams(newTeams);
   };
 
@@ -89,7 +121,12 @@ export default function ListPlayers() {
   const renderTeam = (team: Team, index: number) => {
     return (
       <View key={team.name}>
-        <Text style={styles(theme).text}>Time {index + 1}</Text>
+        {
+          // TODO: Remover texto de média. Usado somente pra teste de balanceamento
+        }
+        <Text style={styles(theme).text}>
+          Time {index + 1} - Média {ratingMean(team.players).toFixed(1)}
+        </Text>
         {!isEmptyArray(team.players) && team.players.map(renderItem)}
       </View>
     );
