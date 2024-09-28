@@ -2,11 +2,14 @@ import TimerNumber from "@/components/TimerNumber";
 import { ColorType } from "@/constants/Colors";
 import { CommonStyles } from "@/constants/CommonStyles";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { format } from "date-fns";
-import { Audio } from "expo-av";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useTimer } from "@/hooks/useTimer";
 import ActiveTimer from "@/components/ActiveTimer";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
@@ -32,6 +35,8 @@ export default function Timer() {
   };
 
   useEffect(() => {
+    // Fix for crashing web
+    if (Platform.OS === "web") return;
     play ? activateKeepAwakeAsync() : deactivateKeepAwake();
   }, [play]);
 

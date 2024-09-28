@@ -14,7 +14,11 @@ import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import isEmptyArray from "@/utils/isEmptyArray";
 import StarsRating from "@/components/StarsRating";
 import ratingNumberToArray from "@/utils/ratingNumberToArray";
-import { checkPlayer, deletePlayer, Player } from "@/redux/reducers/playerSlice";
+import {
+  checkPlayer,
+  deletePlayer,
+  Player,
+} from "@/redux/reducers/playerSlice";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import webAlert from "@/utils/webAlert";
@@ -63,37 +67,54 @@ export default function ListPlayers() {
 
   const renderItem = (player: Player) => {
     return (
-      <TouchableOpacity
-        style={styles(theme).listItemContainer}
-        onLongPress={() => {
-          handleDelete(player);
-        }}
-        onPress={() => {
-          router.push<Player>({ pathname: "/add", params: { playerName: player.playerName, rating: `${player.rating}` } });
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        <Text style={styles(theme).listItemText} numberOfLines={1}>
-          {player.playerName}
-        </Text>
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 10,
-            alignItems: "center",
-            justifyContent: "center"
+        <TouchableOpacity
+          style={styles(theme).listItemContainer}
+          onLongPress={() => {
+            handleDelete(player);
+          }}
+          onPress={() => {
+            router.push<Player>({
+              pathname: "/add",
+              params: {
+                playerName: player.playerName,
+                rating: `${player.rating}`,
+              },
+            });
           }}
         >
-          <StarsRating
-            onChange={() => {}}
-            disabled={true}
-            stars={ratingNumberToArray(player.rating)}
-            starSize={22}
-          />
-          <Checkbox onValueChange={() => {
-            dispatch(checkPlayer({ player }))
-          }} value={player.checked} />
-        </View>
-      </TouchableOpacity>
+          <Text style={styles(theme).listItemText} numberOfLines={1}>
+            {player.playerName}
+          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 10,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <StarsRating
+              onChange={() => {}}
+              disabled={true}
+              stars={ratingNumberToArray(player.rating)}
+              starSize={22}
+            />
+          </View>
+        </TouchableOpacity>
+        <Checkbox
+          onValueChange={() => {
+            dispatch(checkPlayer({ player }));
+          }}
+          value={player.checked}
+        />
+      </View>
     );
   };
 
@@ -173,10 +194,12 @@ const styles = (theme: ColorType) =>
       color: theme.buttonColor,
     },
     listItemContainer: {
+      flex: 1,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
       paddingVertical: 10,
+      marginRight: 10,
     },
     listItemText: {
       fontSize: 20,
