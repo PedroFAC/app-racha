@@ -26,7 +26,7 @@ export function useTimer() {
     if (time === 0 && play) {
       Toast.show("Tempo acabou!", {
         duration: Toast.durations.SHORT,
-        position: Toast.positions.CENTER,
+        position: -120,
         shadow: true,
         animation: true,
         hideOnPress: true,
