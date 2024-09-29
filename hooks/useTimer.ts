@@ -1,5 +1,6 @@
 import { Audio } from "expo-av";
 import { useEffect, useState } from "react";
+import Toast from "react-native-root-toast";
 
 export function useTimer() {
   const [time, setTime] = useState(0);
@@ -23,7 +24,15 @@ export function useTimer() {
     }, 1000);
 
     if (time === 0 && play) {
-      alert("Tempo Acabou");
+      Toast.show("Tempo acabou!", {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.CENTER,
+        shadow: true,
+        animation: true,
+        hideOnPress: true,
+        textColor: "white",
+        backgroundColor: "gray"
+      });
       playSound("end");
       setPlay(false);
     }
