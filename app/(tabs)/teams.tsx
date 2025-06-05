@@ -9,10 +9,11 @@ import { useState } from "react";
 import isEmptyArray from "@/utils/isEmptyArray";
 import ThemedTextInput from "@/components/TextInput";
 import stringToNumber from "@/utils/stringToNumber";
-import randomizeArray from "@/utils/randomizeArray";
 import ratingMean from "@/utils/ratingMean";
 import nearestToAvg from "@/utils/nearestToAvg";
 import fillTeamWithReserves from "@/utils/fillTeamWithReserves";
+import Checkbox from "expo-checkbox";
+import shuffle from "@/utils/shuffle";
 
 export type Team = {
   name: string;
@@ -25,6 +26,7 @@ export default function ListPlayers() {
 
   const [teams, setTeams] = useState<Team[]>([]);
   const [playersPerTeam, setPlayersPerTeam] = useState<string>("");
+  const [isRandom, setIsRandom] = useState<boolean>(false);
 
   const handleSortTeams = () => {
     const playersPerTeamNumber = stringToNumber(playersPerTeam);
@@ -32,7 +34,7 @@ export default function ListPlayers() {
     const teamCount = Math.floor(playersCopy.length / playersPerTeamNumber);
     const maxTeamCount = Math.ceil(playersCopy.length / playersPerTeamNumber);
     const newTeams: Team[] = [];
-    if (teamCount <= 0) return;
+    if (teamCount < 1) return;
     if (playersPerTeamNumber < 1) return;
 
     playersCopy.sort((a, b) => {
@@ -46,9 +48,14 @@ export default function ListPlayers() {
       return rnd === 0 ? -1 : 1;
     });
 
+    if (isRandom) {
+      // Randomize players if isRandom is true
+      shuffle(playersCopy);
+    }
+
     //Grab best players and randomize it
     const bestPlayers = playersCopy.slice(-maxTeamCount);
-    randomizeArray(bestPlayers);
+    shuffle(bestPlayers);
 
     const totalMean: number = ratingMean(playersCopy);
 
@@ -78,13 +85,11 @@ export default function ListPlayers() {
         teamCountIndex++
       ) {
         const currentTeam = newTeams[teamCountIndex];
-        randomizeArray(playersCopy);
+        shuffle(playersCopy);
         // Grab player with the lower totalAvg - currentTeamAvg
-        let playerPick = nearestToAvg(
-          currentTeam.players,
-          playersCopy,
-          totalMean
-        );
+        let playerPick = isRandom
+          ? playersCopy.at(0)
+          : nearestToAvg(currentTeam.players, playersCopy, totalMean);
 
         // Break if no players left or team is full
         if (!playerPick || currentTeam.players.length >= playersPerTeamNumber) {
@@ -158,6 +163,16 @@ export default function ListPlayers() {
           keyboardType="number-pad"
         />
       </View>
+      <View style={styles(theme).checkboxContainer}>
+        <Text style={styles(theme).text}>Modo Aleatório</Text>
+        <Checkbox
+          style={{ padding: 10 }}
+          onValueChange={() => {
+            setIsRandom(!isRandom);
+          }}
+          value={isRandom}
+        />
+      </View>
       <View style={styles(theme).inputContainer}>
         <Button title="Sortear" onPress={handleSortTeams} />
       </View>
@@ -200,4 +215,11 @@ const styles = (theme: ColorType) =>
       marginVertical: 10,
     },
     inputContainer: { gap: 8, paddingBottom: 20 },
+    checkboxContainer: {
+      gap: 8,
+      paddingBottom: 20,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
   });
